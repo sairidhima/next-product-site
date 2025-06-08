@@ -1,14 +1,13 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Product } from '@/src/type/products'; // ✅ Use correct global type
-import rawProducts from '@/src/mock/small/products.json' assert { type: 'json' }; // ✅ required for .json
+import { Product } from '@/src/type/products';
+import rawProducts from '@/src/mock/small/products.json' assert { type: 'json' };
 import SearchBar from '@/src/components/product-search/SearchBar';
 import CategorySelect from '@/src/components/product-search/CategorySelect';
 import ProductGrid from '@/src/components/product-search/ProductGrid';
 import { filterByName, filterByCategory } from '@/src/utils/product-search/filterProducts';
 
-// ✅ Proper cast using global Product type
 const productsData = rawProducts as Product[];
 
 export default function ProductSearchPage() {

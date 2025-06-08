@@ -1,5 +1,5 @@
 import React from 'react';
-import { Product } from '@/src/type/products'; // ✅ Use the global Product type
+import { Product } from '@/src/type/products';
 
 type Props = {
   products: Product[];

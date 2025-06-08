@@ -1,4 +1,4 @@
-import { Product } from '@/src/type/products'; // ✅ ensure import is correct
+import { Product } from '@/src/type/products';
 
 export const filterByName = (products: Product[], name: string): Product[] => {
   return products.filter((p) => p.name.toLowerCase().includes(name.toLowerCase()));
