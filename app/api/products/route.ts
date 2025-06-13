@@ -1,21 +1,58 @@
-import { NextResponse } from 'next/server';
-import smallProducts from '@/src/mock/small/products.json' assert { type: 'json' };
+import { createYoga, createSchema } from 'graphql-yoga';
+import { NextRequest } from 'next/server';
+import rawProducts from '@/src/mock/small/products.json';
 import { Product } from '@/src/type/products';
 
-export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url);
-  const name = searchParams.get('name')?.toLowerCase() || '';
-  const category = searchParams.get('category')?.toLowerCase() || '';
+const products = rawProducts as Product[];
 
-  let results: Product[] = smallProducts as unknown as Product[];
-
-  if (name.length >= 5) {
-    results = results.filter((p) => p.name.toLowerCase().includes(name));
+const typeDefs = `
+  type Product {
+    id: String
+    name: String
+    price: String
+    description: String
+    category: String
+    rating: Float
+    numReviews: Int
+    countInStock: Int
   }
 
-  if (category) {
-    results = results.filter((p) => p.category.toLowerCase() === category);
+  type Query {
+    products(name: String, category: String): [Product!]!
   }
+`;
 
-  return NextResponse.json(results);
-}
+const resolvers = {
+  Query: {
+    products: (_: unknown, args: { name?: string | null; category?: string | null }) => {
+      let result = products;
+
+      const name = args.name?.trim() ?? '';
+      const category = args.category?.trim() ?? '';
+
+      if (args.name !== undefined && (name === '' || name.length < 5)) {
+        throw new Error('The "name" parameter must be at least 5 characters long and not empty.');
+      }
+
+      if (name) {
+        result = result.filter((p) => p.name.toLowerCase().includes(name.toLowerCase()));
+      }
+
+      if (category) {
+        result = result.filter((p) => p.category.toLowerCase() === category.toLowerCase());
+      }
+
+      return result;
+    },
+  },
+};
+
+const yoga = createYoga<{ req: NextRequest }>({
+  schema: createSchema({
+    typeDefs,
+    resolvers,
+  }),
+  graphqlEndpoint: '/api/products',
+});
+
+export { yoga as GET, yoga as POST };
